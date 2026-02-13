@@ -509,22 +509,35 @@ function populateMatchHistory() {
 
 // Initialize dashboard
 function initDashboard() {
-    const seasonStats = calculateSeasonStats();
-    const playerStats = calculatePlayerStats();
-    const story = generateStory(seasonStats, [...playerStats]);
+    try {
+        const seasonStats = calculateSeasonStats();
+        const playerStats = calculatePlayerStats();
+        const story = generateStory(seasonStats, [...playerStats]);
 
-    updateStatCards(seasonStats);
-    updateLastUpdated();
-    document.getElementById('story-text').textContent = story;
-    createResultsChart(seasonStats);
-    createGoalsChart(playerStats);
-    populateLeaderboard(playerStats);
-    populateMatchHistory();
-    setupTableSorting(playerStats);
-    setupModalHandlers();
+        updateStatCards(seasonStats);
+        updateLastUpdated();
+        document.getElementById('story-text').textContent = story;
+        createResultsChart(seasonStats);
+        createGoalsChart(playerStats);
+        populateLeaderboard(playerStats);
+        populateMatchHistory();
+        setupTableSorting(playerStats);
+        setupModalHandlers();
 
-    // Remove loading class to show content
-    document.querySelector('.container').classList.remove('loading');
+        // Remove loading class to show content
+        const container = document.querySelector('.container');
+        if (container) {
+            container.classList.remove('loading');
+            container.style.opacity = '1';
+        }
+    } catch (error) {
+        console.error('Dashboard initialization failed:', error);
+        // Fallback: show content anyway
+        const container = document.querySelector('.container');
+        if (container) {
+            container.style.opacity = '1';
+        }
+    }
 }
 
 // Run when page loads

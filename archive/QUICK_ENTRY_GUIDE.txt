@@ -1,0 +1,71 @@
+================================================================================
+ASPLEY GUISE RHINOS U8s - QUICK DATA ENTRY GUIDE
+================================================================================
+
+You now have TWO ways to add new match data to your spreadsheet:
+
+================================================================================
+OPTION 1: MANUAL ENTRY (Simple, no scripting)
+================================================================================
+
+1. Open the spreadsheet and go to the "Data Entry" sheet (first tab)
+
+2. Fill in the YELLOW cells:
+   - Section 1: Match details (date, opponent, scores, etc.)
+   - Section 2: Goals scored (one row per goal)
+   - Section 3: Playing squad (enter 1 for played, 0 for didn't play)
+
+3. Copy the data to the appropriate sheets:
+   - Match details → Add new row to "Matches" sheet
+   - Goals → Add new rows to "Goals" sheet
+   - Appearances → Add new column to "Appearances" sheet (or update existing)
+
+4. Clear the Data Entry form and you're ready for the next match!
+
+The Dashboard will automatically update with the new statistics.
+
+================================================================================
+OPTION 2: AUTOMATED SCRIPT (Faster, more convenient)
+================================================================================
+
+1. Fill in the "Data Entry" sheet as described above
+
+2. Run the Python script:
+   - Open Terminal/Command Prompt
+   - Navigate to the folder containing the spreadsheet
+   - Run: python3 add_match_data.py
+
+3. The script will:
+   ✓ Read all data from the Data Entry sheet
+   ✓ Add it to the correct sheets automatically
+   ✓ Validate that required fields are filled
+   ✓ Calculate result (W/D/L) automatically
+   ✓ Update all formulas
+   ✓ Offer to clear the form for next match
+
+4. Check the Dashboard to see updated stats!
+
+================================================================================
+TIPS FOR QUICK ENTRY
+================================================================================
+
+• Match ID format: M05, M06, M07, etc. (keep sequential)
+• Date format: YYYY-MM-DD (e.g., 2026-02-14)
+• Use dropdowns for Home/Away and Own Goal (Yes/No)
+• Leave Assister blank if goal was unassisted
+• Enter 1 or 0 for player appearances (not blank)
+• Competition defaults to "League" - change if needed
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Script errors? Check that:
+- You're in the correct folder
+- The spreadsheet file is named exactly: Aspley_Guise_Rhinos_Enhanced.xlsx
+- All required fields in Section 1 are filled in
+- Python 3 is installed: python3 --version
+
+Questions? The script has validation and will tell you what's missing!
+
+================================================================================

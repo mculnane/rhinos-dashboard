@@ -522,6 +522,9 @@ function initDashboard() {
     populateMatchHistory();
     setupTableSorting(playerStats);
     setupModalHandlers();
+
+    // Remove loading class to show content
+    document.querySelector('.container').classList.remove('loading');
 }
 
 // Run when page loads

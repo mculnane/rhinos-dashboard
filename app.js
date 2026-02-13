@@ -86,23 +86,6 @@ function updateStatCards(stats) {
     document.getElementById('stat-winrate').textContent = stats.winRate + '%';
 }
 
-// Update form indicator (last 5 results)
-function updateFormIndicator() {
-    const formIndicator = document.getElementById('form-indicator');
-    formIndicator.innerHTML = '';
-
-    // Get last 5 matches in reverse chronological order
-    const recentMatches = [...seasonData.matches].reverse().slice(0, 5);
-
-    recentMatches.forEach(match => {
-        const box = document.createElement('div');
-        box.className = `form-box ${match.result}`;
-        box.textContent = match.result;
-        box.title = `${match.opponent} (${match.teamGoals}-${match.opponentGoals})`;
-        formIndicator.appendChild(box);
-    });
-}
-
 // Update last updated timestamp
 function updateLastUpdated() {
     const lastUpdatedEl = document.getElementById('last-updated');
@@ -531,7 +514,6 @@ function initDashboard() {
     const story = generateStory(seasonStats, [...playerStats]);
 
     updateStatCards(seasonStats);
-    updateFormIndicator();
     updateLastUpdated();
     document.getElementById('story-text').textContent = story;
     createResultsChart(seasonStats);

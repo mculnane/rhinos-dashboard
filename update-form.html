@@ -286,7 +286,24 @@
                 <strong>GitHub Status:</strong>
                 <span class="status-indicator" id="statusIndicator">Disconnected</span>
             </p>
-            <button class="btn-secondary" onclick="showSetup()" style="width: auto; padding: 8px 16px; font-size: 14px;">Change Settings</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn-secondary" onclick="showSetup()" style="width: auto; padding: 8px 16px; font-size: 14px;">Change Settings</button>
+                <button class="btn-secondary" onclick="exportConfig()" style="width: auto; padding: 8px 16px; font-size: 14px;">📤 Export Config</button>
+                <button class="btn-secondary" onclick="showImport()" style="width: auto; padding: 8px 16px; font-size: 14px;">📥 Import Config</button>
+            </div>
+        </div>
+
+        <!-- Import Config Section -->
+        <div id="importSection" style="display: none; background-color: #fff8f0; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #ffc107;">
+            <h3 style="color: #dc3545; margin-bottom: 10px; font-size: 16px;">Import Configuration</h3>
+            <p style="color: #495057; font-size: 13px; margin-bottom: 10px;">Paste the configuration code from your other device:</p>
+            <div class="form-group">
+                <textarea id="importCode" rows="4" placeholder="Paste your config code here..." style="font-family: monospace; font-size: 12px;"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="importConfig()" style="flex: 1;">Import</button>
+                <button class="btn-secondary" onclick="hideImport()" style="flex: 1;">Cancel</button>
+            </div>
         </div>
 
         <!-- Match Entry Form -->
@@ -445,6 +462,81 @@
             document.getElementById('setupSection').style.display = 'block';
             document.getElementById('statusSection').style.display = 'none';
             document.getElementById('matchForm').style.display = 'none';
+            document.getElementById('importSection').style.display = 'none';
+        }
+
+        function exportConfig() {
+            const username = localStorage.getItem('github_username');
+            const repo = localStorage.getItem('github_repo');
+            const token = localStorage.getItem('github_token');
+
+            if (!username || !repo || !token) {
+                showMessage('No configuration to export', 'error');
+                return;
+            }
+
+            const config = {
+                username: username,
+                repo: repo,
+                token: token
+            };
+
+            const configString = btoa(JSON.stringify(config));
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(configString).then(() => {
+                showMessage('✅ Configuration copied to clipboard! Paste this on your other device.', 'success');
+            }).catch(() => {
+                // Fallback: show in alert for manual copy
+                prompt('Copy this configuration code:', configString);
+            });
+        }
+
+        function showImport() {
+            document.getElementById('importSection').style.display = 'block';
+            document.getElementById('statusSection').style.display = 'none';
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('matchForm').style.display = 'none';
+        }
+
+        function hideImport() {
+            document.getElementById('importSection').style.display = 'none';
+            document.getElementById('statusSection').style.display = 'block';
+        }
+
+        function importConfig() {
+            const configString = document.getElementById('importCode').value.trim();
+
+            if (!configString) {
+                showMessage('Please paste the configuration code', 'error');
+                return;
+            }
+
+            try {
+                const config = JSON.parse(atob(configString));
+
+                if (!config.username || !config.repo || !config.token) {
+                    throw new Error('Invalid configuration format');
+                }
+
+                localStorage.setItem('github_username', config.username);
+                localStorage.setItem('github_repo', config.repo);
+                localStorage.setItem('github_token', config.token);
+
+                showMessage('✅ Configuration imported successfully!', 'success');
+
+                setTimeout(() => {
+                    document.getElementById('importSection').style.display = 'none';
+                    document.getElementById('statusSection').style.display = 'block';
+                    document.getElementById('statusIndicator').className = 'status-indicator status-connected';
+                    document.getElementById('statusIndicator').textContent = 'Connected';
+                    document.getElementById('matchForm').style.display = 'block';
+                    loadConfig();
+                }, 1500);
+
+            } catch (error) {
+                showMessage('❌ Invalid configuration code. Please check and try again.', 'error');
+            }
         }
 
         function addGoal() {

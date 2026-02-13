@@ -114,86 +114,137 @@ function updateLastUpdated() {
 
 // Create Results Pie Chart
 function createResultsChart(stats) {
-    const ctx = document.getElementById('resultsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: [
-                `${stats.wins} win${stats.wins !== 1 ? 's' : ''}`,
-                `${stats.draws} draw${stats.draws !== 1 ? 's' : ''}`,
-                `${stats.losses} loss${stats.losses !== 1 ? 'es' : ''}`
-            ],
-            datasets: [{
-                data: [stats.wins, stats.draws, stats.losses],
-                backgroundColor: [
-                    '#28a745',  // Green for wins
-                    '#ffc107',  // Amber for draws
-                    '#dc3545'   // Red for losses
+    try {
+        console.log('[CHART DEBUG] Starting createResultsChart');
+        console.log('[CHART DEBUG] Stats:', stats);
+
+        const canvas = document.getElementById('resultsChart');
+        console.log('[CHART DEBUG] Canvas element:', canvas);
+
+        if (!canvas) {
+            console.error('[CHART DEBUG] resultsChart canvas not found!');
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        console.log('[CHART DEBUG] Canvas context:', ctx);
+
+        if (typeof Chart === 'undefined') {
+            console.error('[CHART DEBUG] Chart.js not loaded!');
+            return;
+        }
+
+        console.log('[CHART DEBUG] Creating Chart.js instance...');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    `${stats.wins} win${stats.wins !== 1 ? 's' : ''}`,
+                    `${stats.draws} draw${stats.draws !== 1 ? 's' : ''}`,
+                    `${stats.losses} loss${stats.losses !== 1 ? 'es' : ''}`
                 ],
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 10,
-                        font: {
-                            size: 12
+                datasets: [{
+                    data: [stats.wins, stats.draws, stats.losses],
+                    backgroundColor: [
+                        '#28a745',  // Green for wins
+                        '#ffc107',  // Amber for draws
+                        '#dc3545'   // Red for losses
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 10,
+                            font: {
+                                size: 12
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+        console.log('[CHART DEBUG] Results chart created successfully');
+    } catch (error) {
+        console.error('[CHART DEBUG] Error creating results chart:', error);
+        console.error('[CHART DEBUG] Error stack:', error.stack);
+    }
 }
 
 // Create Goals Bar Chart
 function createGoalsChart(playerStats) {
-    const ctx = document.getElementById('goalsChart').getContext('2d');
-    const sortedPlayers = [...playerStats].sort((a, b) => b.goals - a.goals);
+    try {
+        console.log('[CHART DEBUG] Starting createGoalsChart');
+        console.log('[CHART DEBUG] Player stats:', playerStats);
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sortedPlayers.map(p => p.name),
-            datasets: [{
-                label: 'Goals',
-                data: sortedPlayers.map(p => p.goals),
-                backgroundColor: '#dc3545',
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+        const canvas = document.getElementById('goalsChart');
+        console.log('[CHART DEBUG] Canvas element:', canvas);
+
+        if (!canvas) {
+            console.error('[CHART DEBUG] goalsChart canvas not found!');
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        console.log('[CHART DEBUG] Canvas context:', ctx);
+
+        if (typeof Chart === 'undefined') {
+            console.error('[CHART DEBUG] Chart.js not loaded!');
+            return;
+        }
+
+        const sortedPlayers = [...playerStats].sort((a, b) => b.goals - a.goals);
+        console.log('[CHART DEBUG] Sorted players:', sortedPlayers);
+
+        console.log('[CHART DEBUG] Creating Chart.js instance...');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sortedPlayers.map(p => p.name),
+                datasets: [{
+                    label: 'Goals',
+                    data: sortedPlayers.map(p => p.goals),
+                    backgroundColor: '#dc3545',
+                    borderRadius: 4
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    },
-                    grid: {
-                        color: '#e9ecef'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
                     }
                 },
-                x: {
-                    grid: {
-                        display: false
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+        console.log('[CHART DEBUG] Goals chart created successfully');
+    } catch (error) {
+        console.error('[CHART DEBUG] Error creating goals chart:', error);
+        console.error('[CHART DEBUG] Error stack:', error.stack);
+    }
 }
 
 // Sort player stats
@@ -521,19 +572,40 @@ function populateMatchHistory() {
 
 // Initialize dashboard
 function initDashboard() {
+    console.log('[DASHBOARD DEBUG] Starting dashboard initialization...');
+    console.log('[DASHBOARD DEBUG] User agent:', navigator.userAgent);
+    console.log('[DASHBOARD DEBUG] Screen dimensions:', window.innerWidth, 'x', window.innerHeight);
+    console.log('[DASHBOARD DEBUG] Chart.js available:', typeof Chart !== 'undefined');
+
     try {
+        console.log('[DASHBOARD DEBUG] Calculating stats...');
         const seasonStats = calculateSeasonStats();
         const playerStats = calculatePlayerStats();
-        // const story = generateStory(seasonStats, [...playerStats]); // Story hidden until 8+ matches
+        console.log('[DASHBOARD DEBUG] Season stats:', seasonStats);
+        console.log('[DASHBOARD DEBUG] Player stats:', playerStats);
 
+        console.log('[DASHBOARD DEBUG] Updating stat cards...');
         updateStatCards(seasonStats);
+
+        console.log('[DASHBOARD DEBUG] Updating last updated...');
         updateLastUpdated();
-        // document.getElementById('story-text').textContent = story; // Story hidden until 8+ matches
+
+        console.log('[DASHBOARD DEBUG] Creating results chart...');
         createResultsChart(seasonStats);
+
+        console.log('[DASHBOARD DEBUG] Creating goals chart...');
         createGoalsChart(playerStats);
+
+        console.log('[DASHBOARD DEBUG] Populating leaderboard...');
         populateLeaderboard(playerStats);
+
+        console.log('[DASHBOARD DEBUG] Populating match history...');
         populateMatchHistory();
+
+        console.log('[DASHBOARD DEBUG] Setting up table sorting...');
         setupTableSorting(playerStats);
+
+        console.log('[DASHBOARD DEBUG] Setting up modal handlers...');
         setupModalHandlers();
 
         // Remove loading class to show content
@@ -542,8 +614,10 @@ function initDashboard() {
             container.classList.remove('loading');
             container.style.opacity = '1';
         }
+        console.log('[DASHBOARD DEBUG] Dashboard initialization complete!');
     } catch (error) {
-        console.error('Dashboard initialization failed:', error);
+        console.error('[DASHBOARD DEBUG] Dashboard initialization failed:', error);
+        console.error('[DASHBOARD DEBUG] Error stack:', error.stack);
         // Fallback: show content anyway
         const container = document.querySelector('.container');
         if (container) {

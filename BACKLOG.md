@@ -27,27 +27,63 @@
 ## Future Enhancements
 
 ### Spond Integration
-**Status:** Investigation phase
+**Status:** Researched - Implementation options identified
 **Priority:** Medium
 **Purpose:** Display upcoming fixture information from Spond
 
-**Research needed:**
-- Does Spond have a public API?
-- Authentication requirements?
-- What data is available (fixtures, attendance, locations)?
-- Integration complexity (client-side vs. server-side)?
+**Research Summary (Feb 2026):**
 
-**Potential features:**
+❌ **No Official API**
+- Spond does not provide a public/official API
+- No official developer documentation or support
+- Calendar sync is one-way only (Spond → phone calendar, no iCal/RSS export)
+
+✅ **Unofficial Community Solutions**
+- **[Olen/Spond](https://github.com/Olen/Spond)** - Python library (most popular)
+- **[martcl/spond](https://github.com/martcl/spond)** - Unofficial API docs
+- **[Spond-classes](https://github.com/elliot-100/Spond-classes)** - Class abstraction layer
+- All are reverse-engineered, unofficial, may break if Spond updates their internal API
+
+**Available Data via Unofficial API:**
+- ✅ Events (fixtures) with date/group filtering
+- ✅ Event attendance and responses
+- ✅ Group membership
+- ✅ Event details (location, time, description)
+- ✅ Messages/chat (not relevant for dashboard)
+- ✅ Transactions (Spond Club payments - not relevant)
+
+**Implementation Approaches:**
+
+**Option 1: Python Backend Service** (Most Reliable)
+- Use Olen/Spond library on a simple backend (AWS Lambda, Vercel, etc.)
+- Fetch fixtures daily, cache as JSON
+- Dashboard reads cached JSON (like current data.js approach)
+- **Pros:** Reliable, secure credentials, can run on schedule
+- **Cons:** Requires backend hosting, more complex setup
+
+**Option 2: Manual iCal Export** (Simplest)
+- Spond syncs to phone calendar
+- Export iCal file from phone calendar manually
+- Upload to GitHub repo
+- Parse iCal in dashboard JavaScript
+- **Pros:** No backend needed, simple, no API credentials
+- **Cons:** Manual export step, outdated data if not refreshed
+
+**Option 3: Browser Extension** (Complex)
+- Build Chrome/Safari extension to extract data while user browses Spond
+- Store in localStorage, sync to dashboard
+- **Pros:** No backend, automated
+- **Cons:** Very complex, requires extension installation, fragile
+
+**Recommended Approach:**
+Start with **Option 2 (Manual iCal)** for MVP, upgrade to **Option 1 (Python Backend)** if the manual process becomes burdensome.
+
+**Potential Features:**
 - "Next Match" card at top of dashboard
-- Upcoming fixtures section
-- Player availability integration
+- Upcoming 3-5 fixtures section
+- Match countdown timer
 - Match location/time display
-
-**Questions to answer:**
-1. Is there a Spond API or would this require web scraping?
-2. Does Spond provide webhook/RSS feeds?
-3. What authentication method does it use?
-4. Can it be done client-side (like GitHub integration) or need a backend?
+- Player availability display (if Spond responses tracked)
 
 ---
 

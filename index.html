@@ -779,6 +779,160 @@
                 transform: translate(-50%, 0);
             }
         }
+
+        /* Safe Hands Section */
+        .safe-hands-section {
+            border-left-color: #007bff;
+        }
+
+        /* Goalkeeper Card */
+        .goalkeeper-card {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border-radius: 8px;
+            padding: 24px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .goalkeeper-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gk-emoji {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .gk-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .gk-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .gk-stat {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px 12px;
+            border-radius: 6px;
+            backdrop-filter: blur(10px);
+        }
+
+        .gk-stat-value {
+            display: block;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            font-weight: 400;
+            line-height: 1;
+            margin-bottom: 6px;
+            color: white;
+        }
+
+        .gk-stat-label {
+            display: block;
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            opacity: 0.85;
+            line-height: 1.3;
+        }
+
+        .clean-sheets-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            color: var(--gray-800);
+            margin: 24px 0 12px 0;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .clean-sheets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .clean-sheet-item {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .clean-sheet-item:active {
+            transform: scale(0.98);
+        }
+
+        .clean-sheet-check {
+            font-size: 20px;
+            color: #007bff;
+            flex-shrink: 0;
+        }
+
+        .clean-sheet-details {
+            flex-grow: 1;
+        }
+
+        .clean-sheet-date {
+            font-size: 11px;
+            color: var(--gray-700);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .clean-sheet-match {
+            font-size: 14px;
+            color: var(--black);
+            font-weight: 700;
+        }
+
+        .clean-sheet-score {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: #007bff;
+            font-weight: 400;
+            flex-shrink: 0;
+        }
+
+        .clean-sheets-empty {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--gray-700);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        @media (max-width: 400px) {
+            .gk-stat-value {
+                font-size: 28px;
+            }
+
+            .gk-name {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -805,6 +959,39 @@
             <div class="stat-card">
                 <div class="value" id="stat-winrate">0%</div>
                 <div class="label">Win Rate</div>
+            </div>
+        </div>
+
+        <!-- Safe Hands Section -->
+        <div class="section safe-hands-section">
+            <h2><span class="emoji">🧤</span> Safe Hands</h2>
+
+            <!-- Goalkeeper Stats Card -->
+            <div class="goalkeeper-card">
+                <div class="goalkeeper-header">
+                    <span class="gk-emoji">🧤</span>
+                    <span class="gk-name" id="gk-name">Reuben</span>
+                </div>
+                <div class="gk-stats-grid">
+                    <div class="gk-stat">
+                        <span class="gk-stat-value" id="gk-clean-sheets">0</span>
+                        <span class="gk-stat-label">Clean Sheets</span>
+                    </div>
+                    <div class="gk-stat">
+                        <span class="gk-stat-value" id="gk-appearances">0</span>
+                        <span class="gk-stat-label">Appearances</span>
+                    </div>
+                    <div class="gk-stat">
+                        <span class="gk-stat-value" id="gk-clean-sheet-rate">0%</span>
+                        <span class="gk-stat-label">Clean Sheet Rate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clean Sheet Matches List -->
+            <h3 class="clean-sheets-title">Clean Sheet Matches</h3>
+            <div class="clean-sheets-list" id="clean-sheets-list">
+                <!-- Populated by JavaScript -->
             </div>
         </div>
 

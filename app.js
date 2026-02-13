@@ -44,6 +44,43 @@ function calculatePlayerStats() {
     return Object.values(stats).sort((a, b) => b.goals - a.goals);
 }
 
+// Calculate clean sheet statistics for goalkeeper
+function calculateCleanSheetStats() {
+    // Find goalkeeper (hardcoded as Reuben)
+    const goalkeeper = "Reuben";
+
+    // Get all matches where goalkeeper appeared
+    const gkMatches = seasonData.matches.filter(match =>
+        match.squad && match.squad.includes(goalkeeper)
+    );
+
+    // Find clean sheet matches (0 opponent goals)
+    const cleanSheetMatches = gkMatches.filter(match =>
+        match.opponentGoals === 0
+    );
+
+    const appearances = gkMatches.length;
+    const cleanSheets = cleanSheetMatches.length;
+    const cleanSheetRate = appearances > 0
+        ? Math.round((cleanSheets / appearances) * 100)
+        : 0;
+
+    return {
+        goalkeeper,
+        appearances,
+        cleanSheets,
+        cleanSheetRate,
+        cleanSheetMatches: cleanSheetMatches.map(match => ({
+            id: match.id,
+            date: match.date,
+            opponent: match.opponent,
+            homeAway: match.homeAway,
+            teamGoals: match.teamGoals,
+            opponentGoals: match.opponentGoals
+        }))
+    };
+}
+
 // Calculate season statistics
 function calculateSeasonStats() {
     const wins = seasonData.matches.filter(m => m.result === 'W').length;
@@ -586,6 +623,52 @@ function populateMatchHistory() {
     });
 }
 
+// Populate Safe Hands section with clean sheet data
+function populateSafeHands() {
+    const stats = calculateCleanSheetStats();
+
+    // Update goalkeeper stats card
+    document.getElementById('gk-name').textContent = stats.goalkeeper;
+    document.getElementById('gk-clean-sheets').textContent = stats.cleanSheets;
+    document.getElementById('gk-appearances').textContent = stats.appearances;
+    document.getElementById('gk-clean-sheet-rate').textContent = stats.cleanSheetRate + '%';
+
+    // Populate clean sheet matches list
+    const listContainer = document.getElementById('clean-sheets-list');
+
+    if (stats.cleanSheetMatches.length === 0) {
+        listContainer.innerHTML = `
+            <div class="clean-sheets-empty">
+                No clean sheets yet this season. Keep working hard! 🧤
+            </div>
+        `;
+        return;
+    }
+
+    // Reverse to show most recent first
+    const sortedMatches = [...stats.cleanSheetMatches].reverse();
+
+    listContainer.innerHTML = sortedMatches.map(match => {
+        const date = new Date(match.date).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short'
+        });
+
+        const homeAwayIndicator = match.homeAway === 'Home' ? '(H)' : '(A)';
+
+        return `
+            <div class="clean-sheet-item" onclick="showMatchDetail('${match.id}')">
+                <span class="clean-sheet-check">✓</span>
+                <div class="clean-sheet-details">
+                    <div class="clean-sheet-date">${date}</div>
+                    <div class="clean-sheet-match">${match.opponent} ${homeAwayIndicator}</div>
+                </div>
+                <span class="clean-sheet-score">${match.teamGoals}-${match.opponentGoals}</span>
+            </div>
+        `;
+    }).join('');
+}
+
 // Initialize dashboard
 function initDashboard() {
     console.log('[DASHBOARD DEBUG] Starting dashboard initialization...');
@@ -617,6 +700,9 @@ function initDashboard() {
 
         console.log('[DASHBOARD DEBUG] Populating match history...');
         populateMatchHistory();
+
+        console.log('[DASHBOARD DEBUG] Populating safe hands...');
+        populateSafeHands();
 
         console.log('[DASHBOARD DEBUG] Setting up table sorting...');
         setupTableSorting(playerStats);

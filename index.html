@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspley Guise U8 Rhinos - Season Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .form-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 12px;
+        }
+
+        .form-box {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .form-box.W { background-color: #28a745; }
+        .form-box.L { background-color: rgba(255,255,255,0.3); }
+        .form-box.D { background-color: #ffc107; color: #212529; }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 20px 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #dc3545;
+            margin-bottom: 6px;
+            line-height: 1;
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            color: #dc3545;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #dc3545;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .story-text {
+            line-height: 1.7;
+            color: #495057;
+            font-size: 15px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 260px;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background-color: #c82333;
+        }
+
+        th.sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 6px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        th.sorted-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        th.sorted-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 12px 10px;
+            color: #495057;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.15s;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fff8f0;
+        }
+
+        .rank {
+            font-weight: 700;
+            color: #dc3545;
+            font-size: 15px;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .match-result {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .result-W {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .result-L {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .result-D {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .competition-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 4px;
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+
+        .competition-badge.League {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .competition-badge.Friendly {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .footer strong {
+            color: #dc3545;
+        }
+
+        .last-updated {
+            margin-top: 8px;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 400px) {
+            .stat-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .stat-card .value {
+                font-size: 28px;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading state */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 85vh;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .modal-body h3 {
+            color: #dc3545;
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+            font-weight: 700;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Player Stats Summary */
+        .player-stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-pill {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%);
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .stat-pill .stat-label {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .stat-pill .stat-value {
+            display: block;
+            font-size: 24px;
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        /* Match Result Summary */
+        .match-result-summary {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%);
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .match-score {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .team-name, .opponent-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: #dc3545;
+        }
+
+        .match-meta {
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Goals List */
+        .goals-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .goal-item:last-child {
+            border-bottom: none;
+        }
+
+        .goal-icon {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .goal-text {
+            flex-grow: 1;
+            font-size: 14px;
+        }
+
+        .goal-scorer {
+            font-weight: 600;
+            color: #dc3545;
+        }
+
+        .goal-assister {
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* Squad List */
+        .squad-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .squad-player {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* POTM Display */
+        .potm-display {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: 2px solid #f0c000;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Clickable rows/names */
+        #leaderboard tbody tr,
+        #matches tbody tr {
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        #leaderboard tbody tr:active,
+        #matches tbody tr:active {
+            transform: scale(0.98);
+        }
+
+        /* Desktop modal positioning */
+        @media (min-width: 768px) {
+            .modal-content {
+                left: 50%;
+                right: auto;
+                max-width: 600px;
+                transform: translate(-50%, 100%);
+                border-radius: 20px;
+                bottom: 20px;
+                max-height: 80vh;
+            }
+
+            .modal.active .modal-content {
+                transform: translate(-50%, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦏 Aspley Guise U8 Rhinos</h1>
+        <p>Season 2025/26 Tracker</p>
+        <div class="form-indicator" id="form-indicator"></div>
+    </div>
+
+    <div class="container loading">
+        <!-- Stats Cards -->
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="value" id="stat-matches">0</div>
+                <div class="label">Matches</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-wins">0</div>
+                <div class="label">Wins</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-goals">0</div>
+                <div class="label">Goals Scored</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-winrate">0%</div>
+                <div class="label">Win Rate</div>
+            </div>
+        </div>
+
+        <!-- Story So Far -->
+        <div class="section">
+            <h2>📖 The Story So Far</h2>
+            <div class="story-text" id="story-text">
+                Loading season story...
+            </div>
+        </div>
+
+        <!-- Match Results Chart -->
+        <div class="section">
+            <h2>📊 Match Results</h2>
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Goals by Player Chart -->
+        <div class="section">
+            <h2>⚽ Goals by Player</h2>
+            <div class="chart-container">
+                <canvas id="goalsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Player Leaderboard -->
+        <div class="section">
+            <h2>🏆 Season Leaders</h2>
+            <div class="table-container">
+                <table id="leaderboard">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="sortable" data-sort="name">Player</th>
+                            <th class="sortable" data-sort="appearances">Apps</th>
+                            <th class="sortable" data-sort="goals">Goals</th>
+                            <th class="sortable" data-sort="assists">Assists</th>
+                            <th class="sortable" data-sort="potm">POTM</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Matches -->
+        <div class="section">
+            <h2>📅 Match History</h2>
+            <div class="table-container">
+                <table id="matches">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Opponent</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matches-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Aspley Guise FC</strong> | U8 Rhinos Season Tracker<br>
+        <div class="last-updated" id="last-updated"></div>
+    </div>
+
+    <!-- Player Detail Modal -->
+    <div id="player-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="player-modal-name"></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="player-stats-summary">
+                    <div class="stat-pill">
+                        <span class="stat-label">Apps</span>
+                        <span class="stat-value" id="player-modal-apps"></span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-label">Goals</span>
+                        <span class="stat-value" id="player-modal-goals"></span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-label">Assists</span>
+                        <span class="stat-value" id="player-modal-assists"></span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-label">POTM</span>
+                        <span class="stat-value" id="player-modal-potm"></span>
+                    </div>
+                </div>
+                <h3>Match-by-Match Performance</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Opponent</th>
+                                <th>G</th>
+                                <th>A</th>
+                                <th>POTM</th>
+                            </tr>
+                        </thead>
+                        <tbody id="player-modal-matches"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Detail Modal -->
+    <div id="match-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="match-modal-title"></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="match-result-summary">
+                    <div class="match-score">
+                        <span class="team-name">Aspley Guise Rhinos</span>
+                        <span class="score-display" id="match-modal-score"></span>
+                        <span class="opponent-name" id="match-modal-opponent"></span>
+                    </div>
+                    <div class="match-meta">
+                        <span id="match-modal-date"></span>
+                        <span id="match-modal-competition"></span>
+                    </div>
+                </div>
+
+                <h3>⚽ Goals</h3>
+                <div id="match-modal-goals" class="goals-list"></div>
+
+                <h3>👥 Squad</h3>
+                <div id="match-modal-squad" class="squad-list"></div>
+
+                <h3>⭐ Player of the Match</h3>
+                <div id="match-modal-potm" class="potm-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

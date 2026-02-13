@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhinos Data Update Helper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        .setup-section {
+            background-color: #fff8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 2px solid #ffc107;
+        }
+
+        .setup-section h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .setup-section p {
+            color: #495057;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .setup-section ol {
+            font-size: 13px;
+            margin-left: 20px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .setup-section a {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-connected {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-disconnected {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #212529;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+
+        button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #c82333;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .goal-entry {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .goal-entry h4 {
+            margin-bottom: 10px;
+            color: #dc3545;
+            font-size: 14px;
+        }
+
+        .add-goal-btn {
+            background-color: #28a745;
+            margin-top: 10px;
+            width: auto;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .add-goal-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Squad selection checkboxes */
+        .squad-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .squad-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .squad-checkbox-label:hover {
+            background-color: #e9ecef;
+        }
+
+        .squad-checkbox-label input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            border: 1px solid #dc3545;
+            color: #721c24;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #dc3545;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦏 Rhinos Data Update Helper</h1>
+        <p class="subtitle">One-click match updates via GitHub</p>
+
+        <!-- GitHub Setup Section -->
+        <div class="setup-section" id="setupSection">
+            <h3>⚙️ One-Time Setup Required</h3>
+            <p><strong>Step 1:</strong> Create a GitHub Personal Access Token</p>
+            <ol>
+                <li>Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank">GitHub Settings → Fine-grained tokens</a></li>
+                <li>Click "Generate new token"</li>
+                <li>Set token name: "Rhinos Dashboard"</li>
+                <li>Set expiration: 1 year (or custom)</li>
+                <li>Repository access: "Only select repositories" → Choose your rhinos-dashboard repo</li>
+                <li>Permissions: "Repository permissions" → "Contents" → "Read and write"</li>
+                <li>Click "Generate token" and copy it</li>
+            </ol>
+            <p><strong>Step 2:</strong> Enter your repository details below:</p>
+            <div class="form-group">
+                <label>GitHub Username</label>
+                <input type="text" id="githubUsername" placeholder="your-username">
+            </div>
+            <div class="form-group">
+                <label>Repository Name</label>
+                <input type="text" id="githubRepo" placeholder="rhinos-dashboard">
+            </div>
+            <div class="form-group">
+                <label>Personal Access Token</label>
+                <input type="password" id="githubToken" placeholder="github_pat_...">
+            </div>
+            <button onclick="saveGitHubConfig()">Save Configuration</button>
+        </div>
+
+        <!-- Connection Status -->
+        <div id="statusSection" style="display: none;">
+            <p style="margin-bottom: 20px;">
+                <strong>GitHub Status:</strong>
+                <span class="status-indicator" id="statusIndicator">Disconnected</span>
+            </p>
+            <button class="btn-secondary" onclick="showSetup()" style="width: auto; padding: 8px 16px; font-size: 14px;">Change Settings</button>
+        </div>
+
+        <!-- Match Entry Form -->
+        <form id="matchForm" style="display: none;">
+            <div class="form-group">
+                <label>Match ID</label>
+                <input type="text" id="matchId" placeholder="M05" required>
+            </div>
+
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="matchDate" required>
+            </div>
+
+            <div class="form-group">
+                <label>Opponent</label>
+                <input type="text" id="opponent" placeholder="Team Name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Home or Away</label>
+                <select id="homeAway" required>
+                    <option value="Home">Home</option>
+                    <option value="Away">Away</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Rhinos Goals</label>
+                <input type="number" id="teamGoals" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Opponent Goals</label>
+                <input type="number" id="opponentGoals" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Result</label>
+                <select id="result" required>
+                    <option value="W">Win</option>
+                    <option value="D">Draw</option>
+                    <option value="L">Loss</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Competition</label>
+                <select id="competition" required>
+                    <option value="League">League</option>
+                    <option value="Friendly">Friendly</option>
+                    <option value="Cup">Cup</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Player of the Match</label>
+                <input type="text" id="potm" placeholder="Player Name" required>
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px; color: #dc3545;">👥 Squad Selection</h3>
+            <div class="form-group">
+                <label>Select players who appeared in this match:</label>
+                <div class="squad-grid">
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Fabian"> Fabian
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Lake"> Lake
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Darius"> Darius
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Siji"> Siji
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Reuben"> Reuben
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Kian"> Kian
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Aydan"> Aydan
+                    </label>
+                    <label class="squad-checkbox-label">
+                        <input type="checkbox" name="squad" value="Leo"> Leo
+                    </label>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px; color: #dc3545;">⚽ Goals Scored</h3>
+            <div id="goalsContainer"></div>
+            <button type="button" class="add-goal-btn" onclick="addGoal()">+ Add Goal</button>
+
+            <button type="submit">🚀 Submit Update to GitHub</button>
+        </form>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #6c757d;">Updating dashboard...</p>
+        </div>
+
+        <div class="message" id="messageBox"></div>
+    </div>
+
+    <script>
+        let goalCount = 0;
+
+        // Load saved configuration
+        function loadConfig() {
+            const username = localStorage.getItem('github_username');
+            const repo = localStorage.getItem('github_repo');
+            const token = localStorage.getItem('github_token');
+
+            if (username && repo && token) {
+                document.getElementById('githubUsername').value = username;
+                document.getElementById('githubRepo').value = repo;
+                document.getElementById('githubToken').value = token;
+
+                // Show connected status
+                document.getElementById('setupSection').style.display = 'none';
+                document.getElementById('statusSection').style.display = 'block';
+                document.getElementById('statusIndicator').className = 'status-indicator status-connected';
+                document.getElementById('statusIndicator').textContent = 'Connected';
+                document.getElementById('matchForm').style.display = 'block';
+            }
+        }
+
+        function saveGitHubConfig() {
+            const username = document.getElementById('githubUsername').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (!username || !repo || !token) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            localStorage.setItem('github_username', username);
+            localStorage.setItem('github_repo', repo);
+            localStorage.setItem('github_token', token);
+
+            showMessage('Configuration saved! You can now submit match updates.', 'success');
+
+            setTimeout(() => {
+                document.getElementById('setupSection').style.display = 'none';
+                document.getElementById('statusSection').style.display = 'block';
+                document.getElementById('statusIndicator').className = 'status-indicator status-connected';
+                document.getElementById('statusIndicator').textContent = 'Connected';
+                document.getElementById('matchForm').style.display = 'block';
+            }, 1500);
+        }
+
+        function showSetup() {
+            document.getElementById('setupSection').style.display = 'block';
+            document.getElementById('statusSection').style.display = 'none';
+            document.getElementById('matchForm').style.display = 'none';
+        }
+
+        function addGoal() {
+            goalCount++;
+            const container = document.getElementById('goalsContainer');
+            const goalDiv = document.createElement('div');
+            goalDiv.className = 'goal-entry';
+            goalDiv.innerHTML = `
+                <h4>Goal #${goalCount}</h4>
+                <div class="form-group">
+                    <label>Scorer</label>
+                    <input type="text" id="scorer${goalCount}" placeholder="Player Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Assister (leave blank if unassisted)</label>
+                    <input type="text" id="assister${goalCount}" placeholder="Player Name or leave blank">
+                </div>
+            `;
+            container.appendChild(goalDiv);
+        }
+
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = text;
+            messageBox.className = `message ${type} show`;
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 5000);
+        }
+
+        async function submitToGitHub(matchData, goalsData) {
+            const username = localStorage.getItem('github_username');
+            const repo = localStorage.getItem('github_repo');
+            const token = localStorage.getItem('github_token');
+            const filePath = 'data.js';
+
+            try {
+                // Show loading spinner
+                document.getElementById('loadingSpinner').classList.add('show');
+                document.getElementById('matchForm').style.display = 'none';
+
+                // Step 1: Get current file content and SHA
+                const getResponse = await fetch(
+                    `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+
+                if (!getResponse.ok) {
+                    throw new Error('Failed to fetch data.js from GitHub. Check your token and repository name.');
+                }
+
+                const fileData = await getResponse.json();
+                const currentContent = atob(fileData.content);
+                const sha = fileData.sha;
+
+                // Step 2: Parse and modify content
+                const newContent = insertMatchData(currentContent, matchData, goalsData);
+
+                // Step 3: Commit updated file
+                const commitResponse = await fetch(
+                    `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Add match ${matchData.id} vs ${matchData.opponent}`,
+                            content: btoa(newContent),
+                            sha: sha
+                        })
+                    }
+                );
+
+                if (!commitResponse.ok) {
+                    throw new Error('Failed to commit changes to GitHub');
+                }
+
+                // Success!
+                document.getElementById('loadingSpinner').classList.remove('show');
+                showMessage('✅ Match data successfully uploaded! Dashboard will update in a few seconds.', 'success');
+
+                // Reset form
+                setTimeout(() => {
+                    document.getElementById('matchForm').reset();
+                    document.getElementById('goalsContainer').innerHTML = '';
+                    goalCount = 0;
+                    addGoal();
+                    document.getElementById('matchForm').style.display = 'block';
+                }, 2000);
+
+            } catch (error) {
+                document.getElementById('loadingSpinner').classList.remove('show');
+                document.getElementById('matchForm').style.display = 'block';
+                showMessage('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function insertMatchData(content, matchData, goalsData) {
+            // Find the matches array and insert new match before the closing bracket
+            const matchesPattern = /matches:\s*\[([\s\S]*?)\n\s*\],/;
+            const matchesMatch = content.match(matchesPattern);
+
+            if (!matchesMatch) {
+                throw new Error('Could not find matches array in data.js');
+            }
+
+            const matchString = JSON.stringify(matchData, null, 4)
+                .split('\n')
+                .map((line, i) => i === 0 ? '        ' + line : '        ' + line)
+                .join('\n');
+
+            const newMatchesContent = matchesMatch[1] + ',\n' + matchString;
+            content = content.replace(matchesPattern, `matches: [${newMatchesContent}\n    ],`);
+
+            // Find the goals array and insert new goals
+            if (goalsData.length > 0) {
+                const goalsPattern = /goals:\s*\[([\s\S]*?)\n\s*\],/;
+                const goalsMatch = content.match(goalsPattern);
+
+                if (!goalsMatch) {
+                    throw new Error('Could not find goals array in data.js');
+                }
+
+                const goalsString = goalsData.map(goal =>
+                    `        { matchId: "${goal.matchId}", scorer: "${goal.scorer}", assister: ${goal.assister ? `"${goal.assister}"` : 'null'} }`
+                ).join(',\n');
+
+                const commentLine = `\n\n        // ${matchData.id} - ${matchData.opponent} (${goalsData.length} ${goalsData.length === 1 ? 'goal' : 'goals'})\n`;
+                const newGoalsContent = goalsMatch[1] + ',' + commentLine + goalsString;
+                content = content.replace(goalsPattern, `goals: [${newGoalsContent}\n    ],`);
+            }
+
+            return content;
+        }
+
+        document.getElementById('matchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const matchId = document.getElementById('matchId').value;
+            const matchDate = document.getElementById('matchDate').value;
+            const opponent = document.getElementById('opponent').value;
+            const homeAway = document.getElementById('homeAway').value;
+            const teamGoals = parseInt(document.getElementById('teamGoals').value);
+            const opponentGoals = parseInt(document.getElementById('opponentGoals').value);
+            const result = document.getElementById('result').value;
+            const competition = document.getElementById('competition').value;
+            const potm = document.getElementById('potm').value;
+
+            // Collect squad data
+            const squadCheckboxes = document.querySelectorAll('input[name="squad"]:checked');
+            const squad = Array.from(squadCheckboxes).map(cb => cb.value);
+
+            if (squad.length === 0) {
+                showMessage('Please select at least one player for the squad', 'error');
+                return;
+            }
+
+            const matchData = {
+                id: matchId,
+                date: matchDate,
+                opponent: opponent,
+                homeAway: homeAway,
+                teamGoals: teamGoals,
+                opponentGoals: opponentGoals,
+                result: result,
+                competition: competition,
+                potm: potm,
+                squad: squad
+            };
+
+            // Collect goals data
+            const goalsData = [];
+            for (let i = 1; i <= goalCount; i++) {
+                const scorer = document.getElementById(`scorer${i}`).value;
+                const assister = document.getElementById(`assister${i}`).value;
+
+                if (scorer) {
+                    goalsData.push({
+                        matchId: matchId,
+                        scorer: scorer,
+                        assister: assister || null
+                    });
+                }
+            }
+
+            // Submit to GitHub
+            await submitToGitHub(matchData, goalsData);
+        });
+
+        // Initialize
+        loadConfig();
+        addGoal();
+    </script>
+</body>
+</html>

@@ -21,8 +21,11 @@ function calculatePlayerStats() {
         };
     });
 
-    // Count goals and assists
+    // Count goals and assists (excluding own goals)
     seasonData.goals.forEach(goal => {
+        // Skip own goals for statistics
+        if (goal.isOwnGoal) return;
+
         if (stats[goal.scorer]) {
             stats[goal.scorer].goals++;
         }
@@ -467,6 +470,19 @@ function showMatchDetail(matchId) {
         goalsContainer.innerHTML = '<p style="color: #666; font-style: italic;">No goals scored</p>';
     } else {
         goalsContainer.innerHTML = matchGoals.map(goal => {
+            // Handle own goals
+            if (goal.isOwnGoal) {
+                return `
+                    <div class="goal-item">
+                        <span class="goal-icon">🥅</span>
+                        <span class="goal-text">
+                            <span class="goal-scorer">Own goal</span>
+                        </span>
+                    </div>
+                `;
+            }
+
+            // Handle regular goals
             const assisterText = goal.assister
                 ? `<span class="goal-assister"> (assist: ${goal.assister})</span>`
                 : '';

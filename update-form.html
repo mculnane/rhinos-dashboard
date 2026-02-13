@@ -564,15 +564,42 @@
             goalDiv.innerHTML = `
                 <h4>Goal #${goalCount}</h4>
                 <div class="form-group">
-                    <label>Scorer</label>
-                    <input type="text" id="scorer${goalCount}" placeholder="Player Name" required>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="ownGoal${goalCount}" onchange="toggleOwnGoal(${goalCount})" style="width: auto; margin: 0;">
+                        <span>Own Goal</span>
+                    </label>
                 </div>
-                <div class="form-group">
-                    <label>Assister (leave blank if unassisted)</label>
-                    <input type="text" id="assister${goalCount}" placeholder="Player Name or leave blank">
+                <div id="goalFields${goalCount}">
+                    <div class="form-group">
+                        <label>Scorer</label>
+                        <input type="text" id="scorer${goalCount}" placeholder="Player Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Assister (leave blank if unassisted)</label>
+                        <input type="text" id="assister${goalCount}" placeholder="Player Name or leave blank">
+                    </div>
                 </div>
             `;
             container.appendChild(goalDiv);
+        }
+
+        function toggleOwnGoal(goalNum) {
+            const checkbox = document.getElementById(`ownGoal${goalNum}`);
+            const fields = document.getElementById(`goalFields${goalNum}`);
+            const scorerInput = document.getElementById(`scorer${goalNum}`);
+            const assisterInput = document.getElementById(`assister${goalNum}`);
+
+            if (checkbox.checked) {
+                // Hide scorer/assister fields for own goals
+                fields.style.display = 'none';
+                scorerInput.required = false;
+                scorerInput.value = '';
+                assisterInput.value = '';
+            } else {
+                // Show fields for regular goals
+                fields.style.display = 'block';
+                scorerInput.required = true;
+            }
         }
 
         function showMessage(text, type) {
@@ -694,9 +721,12 @@
                     throw new Error('Could not find goals array in data.js');
                 }
 
-                const goalsString = goalsData.map(goal =>
-                    `        { matchId: "${goal.matchId}", scorer: "${goal.scorer}", assister: ${goal.assister ? `"${goal.assister}"` : 'null'} }`
-                ).join(',\n');
+                const goalsString = goalsData.map(goal => {
+                    if (goal.isOwnGoal) {
+                        return `        { matchId: "${goal.matchId}", scorer: null, assister: null, isOwnGoal: true }`;
+                    }
+                    return `        { matchId: "${goal.matchId}", scorer: "${goal.scorer}", assister: ${goal.assister ? `"${goal.assister}"` : 'null'} }`;
+                }).join(',\n');
 
                 const commentLine = `\n\n        // ${matchData.id} - ${matchData.opponent} (${goalsData.length} ${goalsData.length === 1 ? 'goal' : 'goals'})\n`;
                 const newGoalsContent = goalsMatch[1] + ',' + commentLine + goalsString;
@@ -744,15 +774,28 @@
             // Collect goals data
             const goalsData = [];
             for (let i = 1; i <= goalCount; i++) {
-                const scorer = document.getElementById(`scorer${i}`).value;
-                const assister = document.getElementById(`assister${i}`).value;
+                const isOwnGoal = document.getElementById(`ownGoal${i}`)?.checked || false;
 
-                if (scorer) {
+                if (isOwnGoal) {
+                    // Add own goal entry
                     goalsData.push({
                         matchId: matchId,
-                        scorer: scorer,
-                        assister: assister || null
+                        scorer: null,
+                        assister: null,
+                        isOwnGoal: true
                     });
+                } else {
+                    // Add regular goal entry
+                    const scorer = document.getElementById(`scorer${i}`).value;
+                    const assister = document.getElementById(`assister${i}`).value;
+
+                    if (scorer) {
+                        goalsData.push({
+                            matchId: matchId,
+                            scorer: scorer,
+                            assister: assister || null
+                        });
+                    }
                 }
             }
 

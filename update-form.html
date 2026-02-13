@@ -254,6 +254,10 @@
         <!-- GitHub Setup Section -->
         <div class="setup-section" id="setupSection">
             <h3>⚙️ One-Time Setup Required</h3>
+            <p style="text-align: center; margin-bottom: 15px;">
+                <button class="btn-secondary" onclick="showImportFromSetup()" style="width: auto; padding: 8px 16px; font-size: 14px;">📥 Import from Another Device</button>
+            </p>
+            <p style="text-align: center; color: #6c757d; font-size: 12px; margin-bottom: 20px;">— OR set up manually —</p>
             <p><strong>Step 1:</strong> Create a GitHub Personal Access Token</p>
             <ol>
                 <li>Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank">GitHub Settings → Fine-grained tokens</a></li>
@@ -499,9 +503,22 @@
             document.getElementById('matchForm').style.display = 'none';
         }
 
+        function showImportFromSetup() {
+            document.getElementById('importSection').style.display = 'block';
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('statusSection').style.display = 'none';
+            document.getElementById('matchForm').style.display = 'none';
+        }
+
         function hideImport() {
-            document.getElementById('importSection').style.display = 'none';
-            document.getElementById('statusSection').style.display = 'block';
+            const hasConfig = localStorage.getItem('github_token');
+            if (hasConfig) {
+                document.getElementById('importSection').style.display = 'none';
+                document.getElementById('statusSection').style.display = 'block';
+            } else {
+                document.getElementById('importSection').style.display = 'none';
+                document.getElementById('setupSection').style.display = 'block';
+            }
         }
 
         function importConfig() {

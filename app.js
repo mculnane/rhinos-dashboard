@@ -89,13 +89,25 @@ function updateStatCards(stats) {
 // Update last updated timestamp
 function updateLastUpdated() {
     const lastUpdatedEl = document.getElementById('last-updated');
-    const now = new Date();
-    const formatted = now.toLocaleDateString('en-GB', {
+
+    // Use lastUpdated from data.js if available, otherwise fall back to most recent match date
+    let lastUpdateDate;
+    if (seasonData.lastUpdated) {
+        lastUpdateDate = new Date(seasonData.lastUpdated);
+    } else if (seasonData.matches.length > 0) {
+        // Find most recent match date
+        const sortedMatches = [...seasonData.matches].sort((a, b) =>
+            new Date(b.date) - new Date(a.date)
+        );
+        lastUpdateDate = new Date(sortedMatches[0].date);
+    } else {
+        lastUpdateDate = new Date();
+    }
+
+    const formatted = lastUpdateDate.toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        year: 'numeric'
     });
     lastUpdatedEl.textContent = `Last updated: ${formatted}`;
 }

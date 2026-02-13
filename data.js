@@ -2,6 +2,8 @@
 // Update this file to refresh the dashboard
 
 const seasonData = {
+    lastUpdated: "2026-02-07", // YYYY-MM-DD format - update this when adding new matches
+
     matches: [
         {
             id: "M01",

@@ -660,6 +660,15 @@
         }
 
         function insertMatchData(content, matchData, goalsData) {
+            // Update lastUpdated field with match date
+            const lastUpdatedPattern = /lastUpdated:\s*"[^"]*"/;
+            if (lastUpdatedPattern.test(content)) {
+                content = content.replace(lastUpdatedPattern, `lastUpdated: "${matchData.date}"`);
+            } else {
+                // Add lastUpdated field if it doesn't exist
+                content = content.replace(/const seasonData = \{/, `const seasonData = {\n    lastUpdated: "${matchData.date}", // YYYY-MM-DD format - update this when adding new matches\n`);
+            }
+
             // Find the matches array and insert new match before the closing bracket
             const matchesPattern = /matches:\s*\[([\s\S]*?)\n\s*\],/;
             const matchesMatch = content.match(matchesPattern);

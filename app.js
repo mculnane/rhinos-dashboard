@@ -524,11 +524,11 @@ function initDashboard() {
     try {
         const seasonStats = calculateSeasonStats();
         const playerStats = calculatePlayerStats();
-        const story = generateStory(seasonStats, [...playerStats]);
+        // const story = generateStory(seasonStats, [...playerStats]); // Story hidden until 8+ matches
 
         updateStatCards(seasonStats);
         updateLastUpdated();
-        document.getElementById('story-text').textContent = story;
+        // document.getElementById('story-text').textContent = story; // Story hidden until 8+ matches
         createResultsChart(seasonStats);
         createGoalsChart(playerStats);
         populateLeaderboard(playerStats);

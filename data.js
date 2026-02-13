@@ -78,7 +78,9 @@ const seasonData = {
         { matchId: "M02", scorer: "Lake", assister: null },
         { matchId: "M02", scorer: "Kian", assister: null },
         { matchId: "M02", scorer: "Darius", assister: null },
-        // Note: 2 own goals by opponent not tracked in player stats
+        { matchId: "M02", scorer: null, assister: null, isOwnGoal: true },
+        { matchId: "M02", scorer: null, assister: null, isOwnGoal: true },
+        // 2 own goals by opponent (included above)
 
         // M03 - Tattenhoe Youth Jaguars (4 goals)
         { matchId: "M03", scorer: "Kian", assister: "Lake" },

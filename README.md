@@ -332,3 +332,24 @@ rhinos-dashboard/
 - Your repository: `github.com/YOUR-USERNAME/rhinos-dashboard`
 - Token settings: `github.com/settings/tokens`
 - Repository settings: `github.com/YOUR-USERNAME/rhinos-dashboard/settings`
+
+---
+
+## 🔄 Daily Workflow (Git Updates)
+
+After editing files locally (especially `data.js` after a match), push changes to GitHub:
+
+```bash
+cd "/Users/matthew.culnane/Library/CloudStorage/OneDrive-OMNE/Personal/Fabian/U8 Rhinos season data"
+git add data.js
+git commit -m "Add match vs [Opponent Name]"
+git push
+```
+
+Your dashboard will update live in 30-60 seconds at: **https://mculnane.github.io/rhinos-dashboard/**
+
+### Quick Git Commands:
+- **Check status**: `git status`
+- **See recent commits**: `git log --oneline -5`
+- **Undo uncommitted changes**: `git checkout -- data.js`
+- **Pull latest from GitHub**: `git pull`

@@ -789,32 +789,10 @@
         .goalkeeper-card {
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             border-radius: 8px;
-            padding: 24px;
+            padding: 20px;
             color: white;
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
-            margin-bottom: 24px;
-        }
-
-        .goalkeeper-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
             margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .gk-emoji {
-            font-size: 32px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
-
-        .gk-name {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 28px;
-            font-weight: 400;
-            letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
         .gk-stats-grid {
@@ -964,14 +942,10 @@
 
         <!-- Safe Hands Section -->
         <div class="section safe-hands-section">
-            <h2><span class="emoji">🧤</span> Safe Hands</h2>
+            <h2><span class="emoji">🧤</span> Safe Hands: <span id="gk-name">Reuben</span></h2>
 
             <!-- Goalkeeper Stats Card -->
             <div class="goalkeeper-card">
-                <div class="goalkeeper-header">
-                    <span class="gk-emoji">🧤</span>
-                    <span class="gk-name" id="gk-name">Reuben</span>
-                </div>
                 <div class="gk-stats-grid">
                     <div class="gk-stat">
                         <span class="gk-stat-value" id="gk-clean-sheets">0</span>

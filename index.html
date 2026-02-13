@@ -700,6 +700,20 @@
             }
         }
 
+        /* Disable animations on mobile for compatibility */
+        @media (max-width: 768px) {
+            .header h1,
+            .header p,
+            .stat-cards,
+            .section {
+                animation: none !important;
+            }
+
+            .header .emoji {
+                animation: none !important;
+            }
+        }
+
         /* Desktop modal positioning */
         @media (min-width: 768px) {
             .modal-content {

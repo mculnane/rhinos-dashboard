@@ -412,6 +412,10 @@ let currentChartType = 'goals';
 
 // Switch between chart types
 function switchChart(event, chartType) {
+    console.log('[CHART SWITCH] Called with chartType:', chartType);
+    console.log('[CHART SWITCH] Event:', event);
+    console.log('[CHART SWITCH] Event target:', event.target);
+
     currentChartType = chartType;
 
     // Update active tab styling
@@ -419,32 +423,42 @@ function switchChart(event, chartType) {
         tab.classList.remove('active');
     });
     event.target.classList.add('active');
+    console.log('[CHART SWITCH] Updated active tab');
 
     // Update section title and emoji
     const titleElement = document.getElementById('chart-title');
     const emojiElement = document.getElementById('chart-emoji');
+    console.log('[CHART SWITCH] Title element:', titleElement);
+    console.log('[CHART SWITCH] Emoji element:', emojiElement);
 
     // Calculate fresh player stats
     const playerStats = calculatePlayerStats();
+    console.log('[CHART SWITCH] Player stats calculated:', playerStats.length, 'players');
 
     // Render appropriate chart
     switch(chartType) {
         case 'goals':
+            console.log('[CHART SWITCH] Rendering goals chart');
             titleElement.textContent = 'Goals by Player';
             emojiElement.textContent = '⚽';
             createGoalsChart(playerStats);
             break;
         case 'assists':
+            console.log('[CHART SWITCH] Rendering assists chart');
             titleElement.textContent = 'Assists by Player';
             emojiElement.textContent = '🎯';
             createAssistsChart(playerStats);
             break;
         case 'potm':
+            console.log('[CHART SWITCH] Rendering POTM chart');
             titleElement.textContent = 'POTM Awards by Player';
             emojiElement.textContent = '⭐';
             createPOTMChart(playerStats);
             break;
+        default:
+            console.error('[CHART SWITCH] Unknown chart type:', chartType);
     }
+    console.log('[CHART SWITCH] Switch complete');
 }
 
 // Sort player stats

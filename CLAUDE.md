@@ -94,9 +94,15 @@ goals: [
 ### Calculated Stats
 - Season summary cards (matches, wins, goals, win rate)
 - Match results pie chart
-- Goals by player bar chart
+- **Player Stats Chart with Tabs** - Interactive chart with three views:
+  - ⚽ Goals by Player (red bars, default)
+  - 🎯 Assists by Player (green bars)
+  - ⭐ POTM Awards by Player (amber bars)
+- **Safe Hands Section** - Goalkeeper clean sheet tracking for Reuben
+  - Clean sheet count, appearances, clean sheet rate
+  - List of clean sheet matches with click-through to match details
 - Season leaders table with gold/silver/bronze ranks
-- "Story So Far" narrative auto-generated from data
+- "Story So Far" narrative auto-generated from data (currently hidden until 8+ matches)
 - Full match history with competition badges
 
 ### Mobile Optimizations
@@ -222,6 +228,35 @@ Display order: **Apps, Goals, Assists, POTM**
 **Update Frequency**: After each match (~weekly)
 **Audience**: Parents, coaches viewing on phones
 
+## Recent Updates (Session Summary)
+
+### Chart Tabs Feature (Latest)
+- Added interactive tabs to Player Stats Chart for switching between Goals/Assists/POTM views
+- Three chart views: Goals (⚽ red), Assists (🎯 green), POTM (⭐ amber)
+- Implemented with `switchChart(event, chartType)` function in app.js
+- Chart destruction/recreation prevents memory leaks
+- Mobile-optimized with explicit event parameter passing
+- **Known Issue**: User reported tabs working on mobile (issue resolved by user)
+- Debug logging currently enabled in switchChart function (can be removed if desired)
+
+### Safe Hands Section
+- Goalkeeper clean sheet tracking for Reuben
+- Blue gradient card with stats: clean sheets, appearances, clean sheet rate
+- Click-through from clean sheet matches to match detail modal
+- Positioned after Match History, before Player Stats Chart
+
+### Own Goals Support
+- Added `isOwnGoal` flag to goals data structure
+- Own goals display with 🥅 icon and "Own goal" text in match details
+- Excluded from player statistics (goals/assists counts)
+- Supported in update-form.html with checkbox toggle
+- M02 has 2 own goals recorded
+
+### Score Alignment Fix
+- Match detail modal score display uses vertical stacking
+- Prevents text wrapping with long opponent names on mobile
+- Team name (small, gray) → Score → Opponent name (larger, black)
+
 ## Future Enhancements (Potential)
 
 - End-of-season awards page
@@ -230,3 +265,5 @@ Display order: **Apps, Goals, Assists, POTM**
 - Calendar integration
 - Export stats as PDF
 - Historical season comparison (next year)
+- Integration with Spond to show next match and date
+- Remove debug logging from switchChart function (optional cleanup)

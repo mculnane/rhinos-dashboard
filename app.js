@@ -411,7 +411,7 @@ function createPOTMChart(playerStats) {
 let currentChartType = 'goals';
 
 // Switch between chart types
-function switchChart(chartType) {
+function switchChart(event, chartType) {
     currentChartType = chartType;
 
     // Update active tab styling

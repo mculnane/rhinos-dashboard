@@ -234,6 +234,12 @@ function createGoalsChart(playerStats) {
         const ctx = canvas.getContext('2d');
         console.log('[CHART DEBUG] Canvas context:', ctx);
 
+        // Destroy existing chart if it exists
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
         if (typeof Chart === 'undefined') {
             console.error('[CHART DEBUG] Chart.js not loaded!');
             return;
@@ -284,6 +290,160 @@ function createGoalsChart(playerStats) {
     } catch (error) {
         console.error('[CHART DEBUG] Error creating goals chart:', error);
         console.error('[CHART DEBUG] Error stack:', error.stack);
+    }
+}
+
+// Create assists chart
+function createAssistsChart(playerStats) {
+    try {
+        const canvas = document.getElementById('goalsChart');
+        if (!canvas) return;
+
+        // Destroy existing chart if it exists
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const sortedPlayers = [...playerStats].sort((a, b) => b.assists - a.assists);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sortedPlayers.map(p => p.name),
+                datasets: [{
+                    label: 'Assists',
+                    data: sortedPlayers.map(p => p.assists),
+                    backgroundColor: '#28a745',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('[CHART DEBUG] Error creating assists chart:', error);
+    }
+}
+
+// Create POTM awards chart
+function createPOTMChart(playerStats) {
+    try {
+        const canvas = document.getElementById('goalsChart');
+        if (!canvas) return;
+
+        // Destroy existing chart if it exists
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const sortedPlayers = [...playerStats].sort((a, b) => b.potm - a.potm);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sortedPlayers.map(p => p.name),
+                datasets: [{
+                    label: 'POTM Awards',
+                    data: sortedPlayers.map(p => p.potm),
+                    backgroundColor: '#ffc107',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('[CHART DEBUG] Error creating POTM chart:', error);
+    }
+}
+
+// Global variable to track current chart type
+let currentChartType = 'goals';
+
+// Switch between chart types
+function switchChart(chartType) {
+    currentChartType = chartType;
+
+    // Update active tab styling
+    document.querySelectorAll('.chart-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Update section title and emoji
+    const titleElement = document.getElementById('chart-title');
+    const emojiElement = document.getElementById('chart-emoji');
+
+    // Calculate fresh player stats
+    const playerStats = calculatePlayerStats();
+
+    // Render appropriate chart
+    switch(chartType) {
+        case 'goals':
+            titleElement.textContent = 'Goals by Player';
+            emojiElement.textContent = '⚽';
+            createGoalsChart(playerStats);
+            break;
+        case 'assists':
+            titleElement.textContent = 'Assists by Player';
+            emojiElement.textContent = '🎯';
+            createAssistsChart(playerStats);
+            break;
+        case 'potm':
+            titleElement.textContent = 'POTM Awards by Player';
+            emojiElement.textContent = '⭐';
+            createPOTMChart(playerStats);
+            break;
     }
 }
 

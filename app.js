@@ -597,39 +597,6 @@ function switchChart(event, chartType) {
     console.log('[CHART SWITCH] Switch complete');
 }
 
-// Populate match history
-function populateMatchHistory() {
-    const tbody = document.getElementById('matches-body');
-    tbody.innerHTML = '';
-
-    const sortedMatches = [...seasonData.matches].reverse();
-
-    sortedMatches.forEach(match => {
-        const date = new Date(match.date).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short'
-        });
-
-        // Add (H) or (A) to opponent name
-        const homeAwayIndicator = match.homeAway === 'Home' ? '(H)' : '(A)';
-        const opponentDisplay = `${match.opponent} ${homeAwayIndicator}`;
-
-        // Add competition badge if present
-        const competitionBadge = match.competition
-            ? `<span class="competition-badge ${match.competition}">${match.competition}</span>`
-            : '';
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${date}</td>
-            <td>${opponentDisplay}${competitionBadge}</td>
-            <td>${match.teamGoals}-${match.opponentGoals}</td>
-            <td><span class="match-result result-${match.result}">${match.result}</span></td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
 // Modal Functions
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -890,6 +857,20 @@ function populateSafeHands() {
     }).join('');
 }
 
+// Populate player buttons for detail access
+function populatePlayerButtons() {
+    const container = document.getElementById('player-buttons');
+    container.innerHTML = '';
+
+    seasonData.players.forEach(player => {
+        const button = document.createElement('button');
+        button.className = 'player-btn';
+        button.textContent = player.name;
+        button.onclick = () => showPlayerDetail(player.name);
+        container.appendChild(button);
+    });
+}
+
 // Initialize dashboard
 function initDashboard() {
     console.log('[DASHBOARD DEBUG] Starting dashboard initialization...');
@@ -921,6 +902,9 @@ function initDashboard() {
 
         console.log('[DASHBOARD DEBUG] Populating safe hands...');
         populateSafeHands();
+
+        console.log('[DASHBOARD DEBUG] Populating player buttons...');
+        populatePlayerButtons();
 
         console.log('[DASHBOARD DEBUG] Setting up modal handlers...');
         setupModalHandlers();

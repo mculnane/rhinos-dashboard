@@ -955,6 +955,51 @@
                 font-size: 12px;
             }
         }
+
+        /* Player Details Buttons */
+        .player-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .player-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #212529;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .player-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 400px) {
+            .player-buttons {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: 8px;
+            }
+
+            .player-btn {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1065,6 +1110,14 @@
                 Loading season story...
             </div>
         </div> -->
+
+        <!-- Player Details -->
+        <div class="section">
+            <h2><span class="emoji">👤</span> Player Details</h2>
+            <div class="player-buttons" id="player-buttons">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
     </div>
 
     <div class="footer">

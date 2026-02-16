@@ -474,8 +474,65 @@ function createHatTricksChart(playerStats) {
     }
 }
 
+// Create appearances chart
+function createAppearancesChart(playerStats) {
+    try {
+        const canvas = document.getElementById('goalsChart');
+        if (!canvas) return;
+
+        // Destroy existing chart if it exists
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const sortedPlayers = [...playerStats].sort((a, b) => b.appearances - a.appearances);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sortedPlayers.map(p => p.name),
+                datasets: [{
+                    label: 'Appearances',
+                    data: sortedPlayers.map(p => p.appearances),
+                    backgroundColor: '#6c757d',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('[CHART DEBUG] Error creating appearances chart:', error);
+    }
+}
+
 // Global variable to track current chart type
-let currentChartType = 'goals';
+let currentChartType = 'appearances';
 
 // Switch between chart types
 function switchChart(event, chartType) {
@@ -504,6 +561,12 @@ function switchChart(event, chartType) {
 
     // Render appropriate chart
     switch(chartType) {
+        case 'appearances':
+            console.log('[CHART SWITCH] Rendering appearances chart');
+            titleElement.textContent = 'Appearances by Player';
+            emojiElement.textContent = '👥';
+            createAppearancesChart(playerStats);
+            break;
         case 'goals':
             console.log('[CHART SWITCH] Rendering goals chart');
             titleElement.textContent = 'Goals by Player';
@@ -850,8 +913,8 @@ function initDashboard() {
         console.log('[DASHBOARD DEBUG] Creating results chart...');
         createResultsChart(seasonStats);
 
-        console.log('[DASHBOARD DEBUG] Creating goals chart...');
-        createGoalsChart(playerStats);
+        console.log('[DASHBOARD DEBUG] Creating appearances chart...');
+        createAppearancesChart(playerStats);
 
         console.log('[DASHBOARD DEBUG] Populating match history...');
         populateMatchHistory();

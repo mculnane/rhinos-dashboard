@@ -805,7 +805,7 @@ function populateMatchHistory() {
         `;
 
         // Add click handler
-        row.addEventListener('click', () => showMatchDetail(match.id));
+        row.setAttribute('onclick', 'showMatchDetail("' + match.id + '")');
 
         tbody.appendChild(row);
     });
@@ -862,11 +862,11 @@ function populatePlayerButtons() {
     const container = document.getElementById('player-buttons');
     container.innerHTML = '';
 
-    seasonData.players.forEach(player => {
+    seasonData.players.forEach(function(player) {
         const button = document.createElement('button');
         button.className = 'player-btn';
         button.textContent = player.name;
-        button.onclick = () => showPlayerDetail(player.name);
+        button.setAttribute('onclick', 'showPlayerDetail("' + player.name + '")');
         container.appendChild(button);
     });
 }

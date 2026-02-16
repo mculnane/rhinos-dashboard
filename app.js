@@ -1,11 +1,5 @@
 // Aspley Guise U8 Rhinos Dashboard Logic
 
-// Global state for table sorting
-let currentSort = {
-    column: 'goals',
-    direction: 'desc'
-};
-
 // Calculate player statistics
 function calculatePlayerStats() {
     const stats = {};
@@ -17,6 +11,7 @@ function calculatePlayerStats() {
             goals: 0,
             assists: 0,
             potm: 0,
+            hatTricks: 0,
             appearances: player.appearances
         };
     });
@@ -39,6 +34,21 @@ function calculatePlayerStats() {
         if (match.potm && stats[match.potm]) {
             stats[match.potm].potm++;
         }
+    });
+
+    // Calculate hat tricks (matches with 3+ goals per player)
+    seasonData.players.forEach(player => {
+        seasonData.matches.forEach(match => {
+            const goalsInMatch = seasonData.goals.filter(goal =>
+                goal.matchId === match.id &&
+                goal.scorer === player.name &&
+                !goal.isOwnGoal
+            ).length;
+
+            if (goalsInMatch >= 3) {
+                stats[player.name].hatTricks++;
+            }
+        });
     });
 
     return Object.values(stats).sort((a, b) => b.goals - a.goals);
@@ -407,6 +417,63 @@ function createPOTMChart(playerStats) {
     }
 }
 
+// Create hat tricks chart
+function createHatTricksChart(playerStats) {
+    try {
+        const canvas = document.getElementById('goalsChart');
+        if (!canvas) return;
+
+        // Destroy existing chart if it exists
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const sortedPlayers = [...playerStats].sort((a, b) => b.hatTricks - a.hatTricks);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sortedPlayers.map(p => p.name),
+                datasets: [{
+                    label: 'Hat Tricks',
+                    data: sortedPlayers.map(p => p.hatTricks),
+                    backgroundColor: '#9b59b6',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('[CHART DEBUG] Error creating hat tricks chart:', error);
+    }
+}
+
 // Global variable to track current chart type
 let currentChartType = 'goals';
 
@@ -455,65 +522,16 @@ function switchChart(event, chartType) {
             emojiElement.textContent = '⭐';
             createPOTMChart(playerStats);
             break;
+        case 'hatTricks':
+            console.log('[CHART SWITCH] Rendering hat tricks chart');
+            titleElement.textContent = 'Hat Tricks by Player';
+            emojiElement.textContent = '🎩';
+            createHatTricksChart(playerStats);
+            break;
         default:
             console.error('[CHART SWITCH] Unknown chart type:', chartType);
     }
     console.log('[CHART SWITCH] Switch complete');
-}
-
-// Sort player stats
-function sortPlayerStats(playerStats, column, direction) {
-    return [...playerStats].sort((a, b) => {
-        let aVal = a[column];
-        let bVal = b[column];
-
-        // For name, use alphabetical sorting
-        if (column === 'name') {
-            return direction === 'asc'
-                ? aVal.localeCompare(bVal)
-                : bVal.localeCompare(aVal);
-        }
-
-        // For numbers, use numeric sorting
-        return direction === 'asc'
-            ? aVal - bVal
-            : bVal - aVal;
-    });
-}
-
-// Setup table sorting
-function setupTableSorting(playerStats) {
-    const headers = document.querySelectorAll('#leaderboard th.sortable');
-
-    headers.forEach(header => {
-        header.addEventListener('click', () => {
-            const sortColumn = header.dataset.sort;
-
-            // Toggle direction if clicking the same column
-            if (currentSort.column === sortColumn) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = sortColumn;
-                currentSort.direction = 'desc'; // Default to descending for new column
-            }
-
-            // Update header classes
-            headers.forEach(h => {
-                h.classList.remove('sorted-asc', 'sorted-desc');
-            });
-            header.classList.add(`sorted-${currentSort.direction}`);
-
-            // Re-populate table with new sort (this re-adds click handlers)
-            const allPlayerStats = calculatePlayerStats();
-            populateLeaderboard(allPlayerStats);
-        });
-    });
-
-    // Set initial sorted column indicator
-    const initialHeader = document.querySelector(`#leaderboard th[data-sort="${currentSort.column}"]`);
-    if (initialHeader) {
-        initialHeader.classList.add('sorted-desc');
-    }
 }
 
 // Populate match history
@@ -726,40 +744,6 @@ function showMatchDetail(matchId) {
     openModal('match-modal');
 }
 
-// Populate leaderboard table with sorting and click handlers
-function populateLeaderboard(playerStats) {
-    const tbody = document.getElementById('leaderboard-body');
-    tbody.innerHTML = '';
-
-    // Sort the player stats based on current sort
-    const sortedStats = sortPlayerStats(playerStats, currentSort.column, currentSort.direction);
-
-    sortedStats.forEach((player, index) => {
-        const row = document.createElement('tr');
-
-        // Determine rank class for top 3
-        const rankIndex = index + 1;
-        let rankClass = 'rank';
-        if (rankIndex === 1) rankClass += ' rank-1';
-        else if (rankIndex === 2) rankClass += ' rank-2';
-        else if (rankIndex === 3) rankClass += ' rank-3';
-
-        row.innerHTML = `
-            <td class="${rankClass}">${rankIndex}</td>
-            <td>${player.name}</td>
-            <td>${player.appearances}</td>
-            <td>${player.goals}</td>
-            <td>${player.assists}</td>
-            <td>${player.potm}</td>
-        `;
-
-        // Add click handler
-        row.addEventListener('click', () => showPlayerDetail(player.name));
-
-        tbody.appendChild(row);
-    });
-}
-
 // Populate match history with click handlers
 function populateMatchHistory() {
     const tbody = document.getElementById('matches-body');
@@ -869,17 +853,11 @@ function initDashboard() {
         console.log('[DASHBOARD DEBUG] Creating goals chart...');
         createGoalsChart(playerStats);
 
-        console.log('[DASHBOARD DEBUG] Populating leaderboard...');
-        populateLeaderboard(playerStats);
-
         console.log('[DASHBOARD DEBUG] Populating match history...');
         populateMatchHistory();
 
         console.log('[DASHBOARD DEBUG] Populating safe hands...');
         populateSafeHands();
-
-        console.log('[DASHBOARD DEBUG] Setting up table sorting...');
-        setupTableSorting(playerStats);
 
         console.log('[DASHBOARD DEBUG] Setting up modal handlers...');
         setupModalHandlers();

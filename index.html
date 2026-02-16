@@ -984,24 +984,20 @@
             </div>
         </div>
 
-        <!-- Player Stats -->
+        <!-- Player Stats Chart -->
         <div class="section">
-            <h2><span class="emoji">📊</span> Player Stats</h2>
-            <div class="table-container">
-                <table id="leaderboard">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th class="sortable" data-sort="name">Player</th>
-                            <th class="sortable" data-sort="appearances">Apps</th>
-                            <th class="sortable" data-sort="goals">Goals</th>
-                            <th class="sortable" data-sort="assists">Assists</th>
-                            <th class="sortable" data-sort="potm">POTM</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboard-body">
-                    </tbody>
-                </table>
+            <h2><span class="emoji" id="chart-emoji">⚽</span> <span id="chart-title">Goals by Player</span></h2>
+
+            <!-- Chart Tabs -->
+            <div class="chart-tabs">
+                <button class="chart-tab active" onclick="switchChart(event, 'goals')">Goals</button>
+                <button class="chart-tab" onclick="switchChart(event, 'assists')">Assists</button>
+                <button class="chart-tab" onclick="switchChart(event, 'potm')">POTM</button>
+                <button class="chart-tab" onclick="switchChart(event, 'hatTricks')">Hat Tricks</button>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="goalsChart"></canvas>
             </div>
         </div>
 
@@ -1050,22 +1046,6 @@
             <h3 class="clean-sheets-title">Clean Sheet Matches</h3>
             <div class="clean-sheets-list" id="clean-sheets-list">
                 <!-- Populated by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Player Stats Chart -->
-        <div class="section">
-            <h2><span class="emoji" id="chart-emoji">⚽</span> <span id="chart-title">Goals by Player</span></h2>
-
-            <!-- Chart Tabs -->
-            <div class="chart-tabs">
-                <button class="chart-tab active" onclick="switchChart(event, 'goals')">Goals</button>
-                <button class="chart-tab" onclick="switchChart(event, 'assists')">Assists</button>
-                <button class="chart-tab" onclick="switchChart(event, 'potm')">POTM</button>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="goalsChart"></canvas>
             </div>
         </div>
 

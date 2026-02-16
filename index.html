@@ -959,7 +959,7 @@
         /* Player Details Buttons */
         .player-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
         }
 
@@ -989,9 +989,9 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        @media (max-width: 400px) {
+        @media (max-width: 600px) {
             .player-buttons {
-                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
             }
 

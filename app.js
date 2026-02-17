@@ -266,7 +266,7 @@ function createGoalsChart(playerStats) {
                 datasets: [{
                     label: 'Goals',
                     data: sortedPlayers.map(p => p.goals),
-                    backgroundColor: '#dc3545',
+                    backgroundColor: '#fd7e14',
                     borderRadius: 4
                 }]
             },
@@ -325,7 +325,7 @@ function createAssistsChart(playerStats) {
                 datasets: [{
                     label: 'Assists',
                     data: sortedPlayers.map(p => p.assists),
-                    backgroundColor: '#28a745',
+                    backgroundColor: '#0dcaf0',
                     borderRadius: 4
                 }]
             },
@@ -496,7 +496,7 @@ function createAppearancesChart(playerStats) {
                 datasets: [{
                     label: 'Appearances',
                     data: sortedPlayers.map(p => p.appearances),
-                    backgroundColor: '#6c757d',
+                    backgroundColor: '#dc3545',
                     borderRadius: 4
                 }]
             },
